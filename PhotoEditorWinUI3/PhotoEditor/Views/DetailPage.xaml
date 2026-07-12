@@ -1,0 +1,136 @@
+<!-- Copyright (c) Microsoft Corporation. Licensed under the MIT License. -->
+<Page
+    x:Class="PhotoEditor.Views.DetailPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <Grid Grid.Row="0" Padding="16,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="BackButton" Grid.Column="0"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"
+                    Click="BackButton_Click" />
+
+            <TextBlock Grid.Column="1"
+                       Text="{x:Bind ViewModel.CurrentPhoto.ImageTitle, Mode=OneWay}"
+                       Style="{StaticResource SubtitleTextBlockStyle}"
+                       VerticalAlignment="Center"
+                       Margin="12,0,0,0" />
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                <Button Click="ResetButton_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE777;" FontSize="16" />
+                        <TextBlock Text="Reset" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource AccentButtonStyle}"
+                        Click="SaveButton_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE74E;" FontSize="16" />
+                        <TextBlock Text="Save" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Content area: Image + Effect Controls -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Image display -->
+            <Grid Grid.Column="0" Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
+                <Image x:Name="EditImage"
+                       Source="{x:Bind ViewModel.DisplayImage, Mode=OneWay}"
+                       Stretch="Uniform"
+                       Margin="24" />
+            </Grid>
+
+            <!-- Effects panel -->
+            <ScrollViewer Grid.Column="1" Padding="16">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Adjustments"
+                               Style="{StaticResource BodyStrongTextBlockStyle}" />
+
+                    <!-- Exposure -->
+                    <StackPanel>
+                        <TextBlock Text="Exposure" Style="{StaticResource CaptionTextBlockStyle}" />
+                        <Slider x:Name="ExposureSlider"
+                                Minimum="-2" Maximum="2" StepFrequency="0.1"
+                                Value="{x:Bind ViewModel.CurrentPhoto.Exposure, Mode=TwoWay}"
+                                ValueChanged="Effect_ValueChanged" />
+                    </StackPanel>
+
+                    <!-- Contrast -->
+                    <StackPanel>
+                        <TextBlock Text="Contrast" Style="{StaticResource CaptionTextBlockStyle}" />
+                        <Slider x:Name="ContrastSlider"
+                                Minimum="-1" Maximum="1" StepFrequency="0.1"
+                                Value="{x:Bind ViewModel.CurrentPhoto.Contrast, Mode=TwoWay}"
+                                ValueChanged="Effect_ValueChanged" />
+                    </StackPanel>
+
+                    <!-- Temperature -->
+                    <StackPanel>
+                        <TextBlock Text="Temperature" Style="{StaticResource CaptionTextBlockStyle}" />
+                        <Slider x:Name="TempSlider"
+                                Minimum="-1" Maximum="1" StepFrequency="0.1"
+                                Value="{x:Bind ViewModel.CurrentPhoto.Temperature, Mode=TwoWay}"
+                                ValueChanged="Effect_ValueChanged" />
+                    </StackPanel>
+
+                    <!-- Tint -->
+                    <StackPanel>
+                        <TextBlock Text="Tint" Style="{StaticResource CaptionTextBlockStyle}" />
+                        <Slider x:Name="TintSlider"
+                                Minimum="-1" Maximum="1" StepFrequency="0.1"
+                                Value="{x:Bind ViewModel.CurrentPhoto.Tint, Mode=TwoWay}"
+                                ValueChanged="Effect_ValueChanged" />
+                    </StackPanel>
+
+                    <!-- Saturation -->
+                    <StackPanel>
+                        <TextBlock Text="Saturation" Style="{StaticResource CaptionTextBlockStyle}" />
+                        <Slider x:Name="SatSlider"
+                                Minimum="0" Maximum="2" StepFrequency="0.1"
+                                Value="{x:Bind ViewModel.CurrentPhoto.Saturation, Mode=TwoWay}"
+                                ValueChanged="Effect_ValueChanged" />
+                    </StackPanel>
+
+                    <!-- Blur -->
+                    <StackPanel>
+                        <TextBlock Text="Blur" Style="{StaticResource CaptionTextBlockStyle}" />
+                        <Slider x:Name="BlurSlider"
+                                Minimum="0" Maximum="20" StepFrequency="1"
+                                Value="{x:Bind ViewModel.CurrentPhoto.BlurAmount, Mode=TwoWay}"
+                                ValueChanged="Effect_ValueChanged" />
+                    </StackPanel>
+
+                    <!-- Sepia -->
+                    <StackPanel>
+                        <TextBlock Text="Sepia" Style="{StaticResource CaptionTextBlockStyle}" />
+                        <Slider x:Name="SepiaSlider"
+                                Minimum="0" Maximum="1" StepFrequency="0.1"
+                                Value="{x:Bind ViewModel.CurrentPhoto.SepiaIntensity, Mode=TwoWay}"
+                                ValueChanged="Effect_ValueChanged" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>

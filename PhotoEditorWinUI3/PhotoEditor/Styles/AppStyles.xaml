@@ -1,0 +1,14 @@
+<!-- Copyright (c) Microsoft Corporation. Licensed under the MIT License. -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Style overrides and custom resources for Photo Editor -->
+
+    <!-- GridView item style with hover effect -->
+    <Style x:Key="PhotoGridViewItemStyle" TargetType="GridViewItem">
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+</ResourceDictionary>

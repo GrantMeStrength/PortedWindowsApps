@@ -1,0 +1,56 @@
+<!-- Edit Feeds Page — demonstrates multi-select and reordering patterns -->
+<Page
+    x:Class="RssReader.Views.EditFeedsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:RssReader.ViewModels">
+
+    <Grid Padding="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header with actions -->
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Edit Feeds" Style="{StaticResource TitleTextBlockStyle}" />
+            <Button Grid.Column="1" Content="Remove Selected" 
+                    Click="RemoveButton_Click"
+                    Style="{StaticResource AccentButtonStyle}" />
+        </Grid>
+
+        <!-- Feed list with selection -->
+        <ListView Grid.Row="1" x:Name="FeedsList"
+                  SelectionMode="Multiple"
+                  CanReorderItems="True"
+                  AllowDrop="True">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:FeedViewModel">
+                    <Grid Padding="8,12" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <SymbolIcon Symbol="PostUpdate" />
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Text="{x:Bind Name}" 
+                                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock Text="{x:Bind LinkAsString}" 
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" 
+                                   Text="{x:Bind Articles.Count}" 
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Page>

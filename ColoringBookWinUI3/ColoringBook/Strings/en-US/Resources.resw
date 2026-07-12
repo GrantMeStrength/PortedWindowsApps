@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Coloring Book</value>
+  </data>
+  <data name="LibraryTab.Text" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="MyColoringsTab.Text" xml:space="preserve">
+    <value>My Colorings</value>
+  </data>
+  <data name="SaveButton.Label" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ExportButton.Label" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="PrintButton.Label" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="ClearAllWarning" xml:space="preserve">
+    <value>Are you sure you want to clear all your coloring?</value>
+  </data>
+</root>
