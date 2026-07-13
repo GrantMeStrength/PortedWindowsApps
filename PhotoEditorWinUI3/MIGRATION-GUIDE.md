@@ -225,6 +225,51 @@ No changes needed — this control migrated cleanly.
 | File picker | Direct use | InitializeWithWindow required |
 | Target | UWP (Windows 10) | Windows App SDK 1.6+ |
 
+### 11. Namespace Swap: `Windows.UI.Xaml` → `Microsoft.UI.Xaml`
+
+Every UWP XAML type moves to the `Microsoft.UI.Xaml` namespace hierarchy in WinUI 3. This includes controls like `Frame`, `Page`, `NavigationView`, and their sub-namespaces:
+
+| UWP namespace | WinUI 3 namespace |
+|---------------|-------------------|
+| `Windows.UI.Xaml` | `Microsoft.UI.Xaml` |
+| `Windows.UI.Xaml.Controls` | `Microsoft.UI.Xaml.Controls` |
+| `Windows.UI.Xaml.Media.Animation` | `Microsoft.UI.Xaml.Media.Animation` |
+| `Windows.UI.Xaml.Navigation` | `Microsoft.UI.Xaml.Navigation` |
+
+**Pitfall:** The error `The type or namespace name 'Frame' could not be found` (or any other XAML control) almost always means `using Microsoft.UI.Xaml.Controls;` is missing. Visual Studio's "add using" suggestion may offer the wrong `Windows.UI.Xaml.Controls` namespace — both exist in the build graph, but only `Microsoft.UI.Xaml.Controls` works at runtime in WinUI 3.
+
+```csharp
+// ❌ UWP — wrong namespace in WinUI 3
+using Windows.UI.Xaml.Controls;
+
+// ✅ WinUI 3
+using Microsoft.UI.Xaml.Controls;
+```
+
+### 12. `[RelayCommand]` Generates a Command Property, Not a Public Method
+
+`CommunityToolkit.Mvvm`'s `[RelayCommand]` attribute source-generates a **public command property**, not a public wrapper method. The decorated method stays `private`.
+
+```csharp
+// ViewModel
+[RelayCommand]
+private async Task LoadPhotosAsync() { ... }
+// ↑ generates: public AsyncRelayCommand LoadPhotosCommand { get; }
+```
+
+```csharp
+// ❌ CS0122 — 'LoadPhotosAsync' is inaccessible due to its protection level
+await ViewModel.LoadPhotosAsync();
+
+// ✅ Use the generated command
+await ViewModel.LoadPhotosCommand.ExecuteAsync(null);
+
+// ✅ Or bind it in XAML (the idiomatic approach)
+// <Button Command="{x:Bind ViewModel.LoadPhotosCommand}" />
+```
+
+**Pitfall for LLMs:** When generating code-behind that calls ViewModel methods, always check whether the method carries `[RelayCommand]`. If it does, the correct call site is the generated `*Command` property, not the method itself.
+
 ---
 
 ## Documentation Gaps Found
@@ -234,6 +279,8 @@ During this migration, the following gaps were noted in official docs:
 1. **Win2D WinUI 3 migration path** — No clear guidance on switching from `Win2D.uwp` to `Microsoft.Graphics.Win2D` or the Composition→CanvasBitmap rendering approach change.
 2. **C++/WinRT → C# language migration** — Existing case study preserves C++. No guidance for teams wanting to rewrite in C# simultaneously.
 3. **Effect performance patterns** — No docs on debouncing Win2D re-renders during slider input.
+4. **Namespace swap confusion** — The `Windows.UI.Xaml.*` → `Microsoft.UI.Xaml.*` rename is mentioned in migration docs but the IDE tooling (IntelliSense/quick-fix) can silently suggest the wrong namespace, causing runtime failures that are hard to diagnose.
+5. **`[RelayCommand]` access pattern** — CommunityToolkit docs don't prominently warn that the decorated method remains private; developers and LLMs frequently call the method directly and get CS0122.
 
 ---
 
