@@ -307,6 +307,64 @@ The partial property syntax works correctly on **.NET 9** targets with Community
 
 ---
 
+### 14. Unpackaged Apps Crash at Startup with `REGDB_E_CLASSNOTREG`
+
+When running an unpackaged WinUI 3 app (no MSIX), `Application.Start()` throws a COM exception:
+
+```
+System.Runtime.InteropServices.COMException: Class not registered (0x80040154 REGDB_E_CLASSNOTREG)
+```
+
+The stack trace bottoms out at `WinRT.ActivationFactory.Get` and `Application.Start()`. This means the Windows App Runtime bootstrap hasn't run before WinUI tried to initialize.
+
+**Root cause:** Without `<WindowsPackageType>None</WindowsPackageType>` in the project file, the build tooling does **not** auto-generate the `Main()` entry point that calls `Bootstrap.Initialize()`. The runtime is never registered for the process.
+
+**Fix:**
+
+```xml
+<PropertyGroup>
+  <WindowsPackageType>None</WindowsPackageType>
+</PropertyGroup>
+```
+
+This is required for any unpackaged (non-MSIX) WinUI 3 app. It triggers the SDK to emit the bootstrap initializer in the generated `Program.cs`.
+
+**Pitfall for LLMs:** A new WinUI 3 project created via VS template includes this by default. However, generated or hand-authored `.csproj` files frequently omit it, causing a crash that looks like a missing COM registration rather than a missing configuration property.
+
+---
+
+### 15. Windows App Runtime "Download Required" Dialog on Remote / Dev Machines
+
+After fixing `REGDB_E_CLASSNOTREG`, a different dialog may appear: the app prompts the user to download and install the Windows App Runtime, even when it has already been installed.
+
+This typically happens on:
+- Remote Desktop (RDP) sessions where per-user installs don't propagate to the session
+- CI/CD runners
+- Dev VMs where the runtime was installed for a different architecture (x86 vs x64)
+
+**Fix — self-contained deployment:**
+
+```xml
+<PropertyGroup>
+  <WindowsPackageType>None</WindowsPackageType>
+  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+</PropertyGroup>
+```
+
+`WindowsAppSDKSelfContained=true` bundles the Windows App Runtime DLLs into the app's output directory. The app carries its own copy and never queries for a system-wide installation.
+
+Trade-off: output directory grows by ~20 MB, but the app works on any machine with no prerequisites.
+
+**Alternative (fix the runtime install):**
+
+```
+winget install Microsoft.WindowsAppRuntime.1.6
+```
+
+Make sure to install the architecture that matches your build platform (x64 for x64 builds). Per-machine install (run as admin) is more reliable than per-user on remote sessions.
+
+---
+
 ## Documentation Gaps Found
 
 During this migration, the following gaps were noted in official docs:
@@ -316,6 +374,8 @@ During this migration, the following gaps were noted in official docs:
 3. **Effect performance patterns** — No docs on debouncing Win2D re-renders during slider input.
 4. **Namespace swap confusion** — The `Windows.UI.Xaml.*` → `Microsoft.UI.Xaml.*` rename is mentioned in migration docs but the IDE tooling (IntelliSense/quick-fix) can silently suggest the wrong namespace, causing runtime failures that are hard to diagnose.
 5. **`[RelayCommand]` access pattern** — CommunityToolkit docs don't prominently warn that the decorated method remains private; developers and LLMs frequently call the method directly and get CS0122.
+6. **`WindowsPackageType=None` for unpackaged apps** — Docs mention this property but don't clearly call out that omitting it causes `REGDB_E_CLASSNOTREG` at startup rather than a configuration warning.
+7. **`WindowsAppSDKSelfContained` for remote/CI environments** — The self-contained deployment option exists but is buried; it's the fastest fix for "download runtime" dialogs on machines where the runtime isn't reliably installed.
 
 ---
 
