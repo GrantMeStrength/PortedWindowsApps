@@ -179,28 +179,39 @@ throughout the codebase. This is the standard WinUI 3 pattern.
 
 ---
 
-### 7. Windows Ink Namespace Changes
+### 7. Windows Ink Namespace — The Classic Types Did NOT Move
 
-**Impact**: LOW — API surface is identical, only namespace changed.
+**Impact**: HIGH — Common misconception causes all inking types to fail to resolve.
+
+The WinUI 3 SDK introduces `Microsoft.UI.Input.Inking`, which is a **new lower-level API** (`InkPresenterHost`-based). It does **not** contain the classic ink types. Those types remain in `Windows.UI.Input.Inking` — unchanged from UWP:
 
 ```csharp
-// UWP
+// UWP AND WinUI 3 desktop apps — the namespace is THE SAME
 using Windows.UI.Input.Inking;
-
-// WinUI 3
-using Microsoft.UI.Input.Inking;
+// InkStroke, InkStrokeContainer, InkPresenter, InkDrawingAttributes,
+// InkStrokesCollectedEventArgs, InkStrokesErasedEventArgs, InkInputProcessingMode, PenTipShape
 ```
 
-All ink APIs work the same:
-- `InkCanvas.InkPresenter` ✅
-- `InkPresenter.StrokesCollected` ✅
-- `InkStrokeContainer.SaveAsync()` / `LoadAsync()` ✅
-- `InkDrawingAttributes` ✅
-- `ds.DrawInk(strokes)` (Win2D) ✅
+The `Microsoft.UI.Input.Inking` namespace exists but is NOT the replacement for the above.
 
-**The one gotcha**: `CoreInputDeviceTypes` moved from `Windows.UI.Core` to
-`Microsoft.UI.Core`. If you grep-replace `Windows.UI.Xaml` → `Microsoft.UI.Xaml`,
-you might miss this one because it's not in the Xaml namespace.
+**`CoreInputDeviceTypes` also did NOT move**: it stays in `Windows.UI.Core`, not `Microsoft.UI.Core`:
+
+```csharp
+// Correct for WinUI 3 desktop
+presenter.InputDeviceTypes =
+    Windows.UI.Core.CoreInputDeviceTypes.Mouse |
+    Windows.UI.Core.CoreInputDeviceTypes.Pen |
+    Windows.UI.Core.CoreInputDeviceTypes.Touch;
+```
+
+**`InkCanvas` XAML control**: In WinUI 3, `InkCanvas` is in `Microsoft.UI.Xaml.Controls` and must be referenced with the WinUI 3 XAML namespace prefix:
+
+```xml
+<!-- WinUI 3 ColoringPage.xaml -->
+xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+...
+<controls:InkCanvas x:Name="DrawingCanvas" />
+```
 
 ---
 
@@ -351,3 +362,6 @@ These topics are missing or insufficient in the current UWP→WinUI 3 migration 
 6. **IRandomAccessStream bridging** — How to bridge System.IO streams with WinRT stream APIs
 7. **`InkCanvas` XAML namespace in WinUI 3** — `InkCanvas` is not in the default XAML namespace and requires an explicit `xmlns:controls="using:Microsoft.UI.Xaml.Controls"` declaration; this isn't called out in migration docs.
 8. **Win2D version staleness** — Old patch versions (e.g. 1.2.1) are periodically yanked from NuGet; docs don't warn about this or recommend a safe version pinning strategy.
+9. **`Windows.UI.Input.Inking` stays unchanged** — The ink data types (InkStroke, InkPresenter, InkStrokeContainer, etc.) remain in `Windows.UI.Input.Inking` for WinUI 3 desktop apps. `Microsoft.UI.Input.Inking` is a separate lower-level API; migration docs do not clarify this distinction, leading to widespread namespace errors.
+10. **`CoreInputDeviceTypes` namespace unchanged** — Stays in `Windows.UI.Core`, not `Microsoft.UI.Core`; grep-based migration tools commonly get this wrong.
+11. **`[RelayCommand]` incompatibility** — CommunityToolkit.Mvvm's `[RelayCommand]` only works on methods with `void` or `Task` return types and 0–1 parameters. Methods returning domain types (e.g. `UndoRedoOperation?`) or accepting multiple parameters must be decorated manually or called directly from code-behind.

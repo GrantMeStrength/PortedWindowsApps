@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Microsoft.UI.Input.Inking;
+using Windows.UI.Input.Inking;
 
 namespace ColoringBook.UndoRedoOperations
 {
@@ -8,7 +8,7 @@ namespace ColoringBook.UndoRedoOperations
     /// 
     /// MIGRATION NOTE: This is pure C# logic — no UWP/WinUI dependencies except
     /// the InkStroke type, which moved from Windows.UI.Input.Inking to
-    /// Microsoft.UI.Input.Inking in WinUI 3.
+    /// Windows.UI.Input.Inking — unchanged from UWP.
     /// </summary>
     public abstract class UndoRedoOperation
     {

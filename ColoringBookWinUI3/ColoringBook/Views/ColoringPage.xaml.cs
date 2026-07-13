@@ -28,8 +28,8 @@ namespace ColoringBook.Views
     ///    UWP used CoreWindow for pointer events in custom ink processing.
     ///    WinUI 3: Use InputPointerSource or standard XAML pointer events.
     /// 
-    /// 3. InkCanvas behavior is nearly identical but namespace changed:
-    ///    Windows.UI.Input.Inking → Microsoft.UI.Input.Inking
+    /// 3. InkCanvas inking types stay in Windows.UI.Input.Inking — NOT Microsoft.UI.Input.Inking
+    ///    (Microsoft.UI.Input.Inking is a different, lower-level API; the classic ink types are unchanged)
     /// 
     /// 4. Printing: See PrintHelper.cs for the interop approach.
     /// </summary>

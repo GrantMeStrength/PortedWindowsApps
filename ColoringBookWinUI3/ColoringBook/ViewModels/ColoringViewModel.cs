@@ -7,7 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using ColoringBook.Models;
 using ColoringBook.UndoRedoOperations;
 using Microsoft.UI;
-using Microsoft.UI.Input.Inking;
+using Windows.UI.Input.Inking;
 using Windows.UI;
 
 namespace ColoringBook.ViewModels
@@ -18,7 +18,7 @@ namespace ColoringBook.ViewModels
     /// MIGRATION NOTES:
     /// - Color type: WinUI 3 uses Windows.UI.Color (same as UWP), NOT Microsoft.UI.Color
     ///   for ink stroke attributes. This is a common confusion point.
-    /// - InkDrawingAttributes namespace changed to Microsoft.UI.Input.Inking
+    /// - InkDrawingAttributes stays in Windows.UI.Input.Inking (same as UWP — NOT Microsoft.UI.Input.Inking)
     /// - Undo/Redo system is pure C# logic — ports unchanged
     /// </summary>
     public partial class ColoringViewModel : ObservableObject
@@ -26,13 +26,9 @@ namespace ColoringBook.ViewModels
         private readonly UndoRedoManager _undoRedoManager = new();
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(UndoCommand))]
-        [NotifyCanExecuteChangedFor(nameof(RedoCommand))]
         private bool _canUndo;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(UndoCommand))]
-        [NotifyCanExecuteChangedFor(nameof(RedoCommand))]
         private bool _canRedo;
 
         [ObservableProperty]
@@ -90,8 +86,8 @@ namespace ColoringBook.ViewModels
         /// <summary>
         /// Gets the InkDrawingAttributes for the current tool configuration.
         /// 
-        /// MIGRATION NOTE: InkDrawingAttributes is in Microsoft.UI.Input.Inking (WinUI 3)
-        /// instead of Windows.UI.Input.Inking (UWP). The API surface is the same.
+        /// MIGRATION NOTE: InkDrawingAttributes remains in Windows.UI.Input.Inking in WinUI 3
+        /// desktop apps — contrary to early documentation suggesting Microsoft.UI.Input.Inking.
         /// </summary>
         public InkDrawingAttributes GetCurrentDrawingAttributes()
         {
@@ -129,7 +125,6 @@ namespace ColoringBook.ViewModels
             HasUnsavedChanges = true;
         }
 
-        [RelayCommand(CanExecute = nameof(CanUndo))]
         public UndoRedoOperation? Undo()
         {
             var op = _undoRedoManager.Undo();
@@ -138,7 +133,6 @@ namespace ColoringBook.ViewModels
             return op;
         }
 
-        [RelayCommand(CanExecute = nameof(CanRedo))]
         public UndoRedoOperation? Redo()
         {
             var op = _undoRedoManager.Redo();
@@ -153,7 +147,6 @@ namespace ColoringBook.ViewModels
             CanRedo = _undoRedoManager.CanRedo;
         }
 
-        [RelayCommand]
         private async Task ExportAsync(
             string backgroundImagePath,
             IReadOnlyList<InkStroke> strokes,
