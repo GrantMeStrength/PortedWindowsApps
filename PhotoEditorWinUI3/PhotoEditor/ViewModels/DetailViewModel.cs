@@ -27,21 +27,16 @@ namespace PhotoEditor.ViewModels;
 public partial class DetailViewModel : ObservableObject
 {
     [ObservableProperty]
-    public partial Photo? CurrentPhoto { get; set; }
+    private Photo? _currentPhoto;
 
     [ObservableProperty]
-    public partial BitmapImage? DisplayImage { get; set; }
+    private BitmapImage? _displayImage;
 
     [ObservableProperty]
-    public partial bool IsEditMode { get; set; }
+    private bool _isEditMode = true;
 
     private CanvasBitmap? _originalBitmap;
     private CanvasDevice? _device;
-
-    public DetailViewModel()
-    {
-        IsEditMode = true;
-    }
 
     public async Task LoadImageAsync()
     {

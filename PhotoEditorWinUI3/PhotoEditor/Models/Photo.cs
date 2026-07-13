@@ -21,8 +21,6 @@ public partial class Photo : ObservableObject
         ImageFileType = fileType;
         ImageWidth = width;
         ImageHeight = height;
-        Saturation = 1.0f;
-        SepiaIntensity = 0.5f;
     }
 
     // File properties (read-only after construction)
@@ -43,11 +41,11 @@ public partial class Photo : ObservableObject
 
     // Thumbnail for gallery view (loaded lazily)
     [ObservableProperty]
-    public partial BitmapImage? Thumbnail { get; set; }
+    private BitmapImage? _thumbnail;
 
     // Full image source for detail view
     [ObservableProperty]
-    public partial BitmapImage? ImageSource { get; set; }
+    private BitmapImage? _imageSource;
 
     // --- Effect properties ---
     // These map 1:1 to Win2D effect parameters.
@@ -55,25 +53,25 @@ public partial class Photo : ObservableObject
     // CommunityToolkit.Mvvm generates all that boilerplate.
 
     [ObservableProperty]
-    public partial float Exposure { get; set; }
+    private float _exposure;
 
     [ObservableProperty]
-    public partial float Temperature { get; set; }
+    private float _temperature;
 
     [ObservableProperty]
-    public partial float Tint { get; set; }
+    private float _tint;
 
     [ObservableProperty]
-    public partial float Contrast { get; set; }
+    private float _contrast;
 
     [ObservableProperty]
-    public partial float Saturation { get; set; }
+    private float _saturation = 1.0f;
 
     [ObservableProperty]
-    public partial float BlurAmount { get; set; }
+    private float _blurAmount;
 
     [ObservableProperty]
-    public partial float SepiaIntensity { get; set; }
+    private float _sepiaIntensity = 0.5f;
 
     /// <summary>
     /// Resets all effects to default values.

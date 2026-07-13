@@ -11,7 +11,8 @@
     <UseWinUI>true</UseWinUI>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>13.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
+    <NoWarn>MVVMTK0045</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

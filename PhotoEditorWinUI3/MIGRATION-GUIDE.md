@@ -272,6 +272,41 @@ await ViewModel.LoadPhotosCommand.ExecuteAsync(null);
 
 ---
 
+### 13. `[ObservableProperty]` Partial Property Syntax Requires .NET 9 / C# 13
+
+CommunityToolkit.Mvvm 8.3+ emits **MVVMTK0045** warnings for field-backed `[ObservableProperty]` fields in WinRT/WinUI 3 projects, directing you to use partial property syntax instead:
+
+```csharp
+// New partial property syntax (warned-about target)
+[ObservableProperty]
+public partial float Exposure { get; set; }
+```
+
+However, **this syntax only works when the source generator produces an implementation partial**, which requires the generator to use C# 13's `field` keyword. On **.NET 8 targets**, even with `<LangVersion>13.0</LangVersion>`, this fails with:
+
+```
+CS9248: Partial property 'Photo.Exposure' must have an implementation part.
+```
+
+The source generator in CommunityToolkit.Mvvm 8.4.0 does not produce the implementation half when targeting `net8.0`.
+
+**Workaround for .NET 8 projects:** Keep the field-backed syntax and suppress MVVMTK0045:
+
+```xml
+<!-- In .csproj -->
+<NoWarn>MVVMTK0045</NoWarn>
+```
+
+```csharp
+// Field syntax still works and is not broken — MVVMTK0045 is a warning, not an error
+[ObservableProperty]
+private float _exposure;
+```
+
+The partial property syntax works correctly on **.NET 9** targets with CommunityToolkit.Mvvm 8.3+.
+
+---
+
 ## Documentation Gaps Found
 
 During this migration, the following gaps were noted in official docs:
