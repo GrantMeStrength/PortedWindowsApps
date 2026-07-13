@@ -277,8 +277,8 @@ The UWP .csproj was 34KB with hundreds of explicit file includes. The SDK-style 
     <UseWinUI>true</UseWinUI>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
-    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.2.1" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260529003" />
+    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
   </ItemGroup>
 </Project>
@@ -365,3 +365,4 @@ These topics are missing or insufficient in the current UWP→WinUI 3 migration 
 9. **`Windows.UI.Input.Inking` stays unchanged** — The ink data types (InkStroke, InkPresenter, InkStrokeContainer, etc.) remain in `Windows.UI.Input.Inking` for WinUI 3 desktop apps. `Microsoft.UI.Input.Inking` is a separate lower-level API; migration docs do not clarify this distinction, leading to widespread namespace errors.
 10. **`CoreInputDeviceTypes` namespace unchanged** — Stays in `Windows.UI.Core`, not `Microsoft.UI.Core`; grep-based migration tools commonly get this wrong.
 11. **`[RelayCommand]` incompatibility** — CommunityToolkit.Mvvm's `[RelayCommand]` only works on methods with `void` or `Task` return types and 0–1 parameters. Methods returning domain types (e.g. `UndoRedoOperation?`) or accepting multiple parameters must be decorated manually or called directly from code-behind.
+12. **`InkCanvas` requires WinAppSDK 1.8 to be usable as a C# type** — In WinAppSDK 1.6, `InkCanvas` can be declared in XAML (WinRT type activation works), but there is **no C# class projection** for `Microsoft.UI.Xaml.Controls.InkCanvas`. Any C# code that references the type directly — constructor parameters, `new InkCanvas()`, or `x:Name` field access — will fail with CS0246. This affects `CanvasInputController`, `PrintHelper`, and the XAML code-behind field for `DrawingCanvas`. **Fix: upgrade to WinAppSDK ≥ 1.8.** Migration docs do not mention this version requirement.

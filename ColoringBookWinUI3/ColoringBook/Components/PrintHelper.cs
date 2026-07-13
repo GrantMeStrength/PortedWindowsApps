@@ -6,7 +6,6 @@ using Microsoft.Graphics.Canvas;
 using Windows.UI.Input.Inking;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Printing;
 using Windows.Graphics.Printing;
