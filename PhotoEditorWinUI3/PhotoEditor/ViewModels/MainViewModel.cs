@@ -94,16 +94,14 @@ public partial class MainViewModel : ObservableObject
             props.Width,
             props.Height);
 
-        // Load thumbnail
-        var thumbnail = await file.GetThumbnailAsync(
-            Windows.Storage.FileProperties.ThumbnailMode.PicturesView, 300);
-
-        if (thumbnail != null)
-        {
-            var bitmapImage = new BitmapImage();
-            await bitmapImage.SetSourceAsync(thumbnail);
-            photo.Thumbnail = bitmapImage;
-        }
+        // Load thumbnail directly from file stream.
+        // Migration: GetThumbnailAsync relies on Shell COM providers (REGDB_E_CLASSNOTREG)
+        // which are unreliable in unpackaged WinUI 3 apps. Loading from the file stream
+        // with DecodePixelWidth avoids the Shell COM layer entirely.
+        using var stream = File.OpenRead(filePath);
+        var bitmapImage = new BitmapImage { DecodePixelWidth = 300 };
+        await bitmapImage.SetSourceAsync(stream.AsRandomAccessStream());
+        photo.Thumbnail = bitmapImage;
 
         return photo;
     }
