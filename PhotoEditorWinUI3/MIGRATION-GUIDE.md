@@ -22,11 +22,13 @@ This migration converts the [Windows-appsample-photo-editor](https://github.com/
 
 ```xml
 <!-- ✅ Correct for WinUI 3 -->
-<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.2.1" />
+<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.0" />
 
 <!-- ❌ UWP only - will not work -->
 <PackageReference Include="Win2D.uwp" Version="1.27.0" />
 ```
+
+> **Pitfall:** Older patch versions of `Microsoft.Graphics.Win2D` (e.g. 1.2.1) are periodically removed from NuGet. Pin to the latest available or use `1.*` to avoid restore failures. If you see `WinRT.Runtime` assembly resolution errors, this is almost always the root cause — it's a downstream symptom of a Win2D version mismatch, not a missing package on its own.
 
 ---
 
