@@ -31,7 +31,7 @@ public sealed partial class MainPage : Page
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        await ViewModel.LoadPhotosAsync();
+        await ViewModel.LoadPhotosCommand.ExecuteAsync(null);
     }
 
     private void ImageGridView_ItemClick(object sender, ItemClickEventArgs e)
