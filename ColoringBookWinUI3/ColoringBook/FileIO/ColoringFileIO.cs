@@ -3,7 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ColoringBook.Models;
-using Microsoft.UI.Input.Inking;
+using Windows.UI.Input.Inking;
 
 namespace ColoringBook.FileIO
 {

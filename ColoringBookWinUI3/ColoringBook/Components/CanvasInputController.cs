@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.UI.Input.Inking;
+using Windows.UI.Input.Inking;
 using Microsoft.UI.Xaml.Controls;
 using ColoringBook.ViewModels;
 using ColoringBook.UndoRedoOperations;
@@ -43,9 +43,9 @@ namespace ColoringBook.Components
 
             // Accept all input types (mouse, touch, pen)
             presenter.InputDeviceTypes =
-                Microsoft.UI.Core.CoreInputDeviceTypes.Mouse |
-                Microsoft.UI.Core.CoreInputDeviceTypes.Pen |
-                Microsoft.UI.Core.CoreInputDeviceTypes.Touch;
+                Windows.UI.Core.CoreInputDeviceTypes.Mouse |
+                Windows.UI.Core.CoreInputDeviceTypes.Pen |
+                Windows.UI.Core.CoreInputDeviceTypes.Touch;
 
             // Set initial drawing attributes
             presenter.UpdateDefaultDrawingAttributes(_viewModel.GetCurrentDrawingAttributes());
@@ -76,8 +76,9 @@ namespace ColoringBook.Components
         /// <summary>
         /// Applies an undo/redo operation to the ink canvas.
         /// 
-        /// MIGRATION NOTE: InkStroke manipulation APIs are identical between UWP and WinUI 3.
-        /// The key difference is the namespace (Microsoft.UI.Input.Inking).
+        /// MIGRATION NOTE: InkCanvas and InkPresenter remain in their WinUI 3 equivalents.
+        /// InkStroke data types stay in Windows.UI.Input.Inking — Microsoft.UI.Input.Inking
+        /// is a lower-level API (InkPresenterHost) and does NOT contain these types.
         /// </summary>
         public void ApplyUndoRedo(UndoRedoOperation? operation, bool isUndo)
         {
