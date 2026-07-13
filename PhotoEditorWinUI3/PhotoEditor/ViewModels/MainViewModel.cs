@@ -26,10 +26,10 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<Photo> Photos { get; } = new();
 
     [ObservableProperty]
-    private bool _isLoading;
+    public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
-    private bool _hasNoPhotos;
+    public partial bool HasNoPhotos { get; set; }
 
     [RelayCommand]
     private async Task LoadPhotosAsync()
