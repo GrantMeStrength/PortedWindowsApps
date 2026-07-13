@@ -1,0 +1,151 @@
+<!-- MIGRATION NOTE:
+     The original MasterDetailPage used VisualStates to switch between wide (side-by-side) 
+     and narrow (single pane) layouts. This pattern still works in WinUI 3, but we can
+     now also use the TwoPaneView control for a more declarative approach.
+     
+     Here we keep the VisualState approach for educational purposes (it's the most common
+     migration pattern you'll encounter).
+     
+     KEY CHANGE: x:Bind works the same but requires explicitly setting x:DataType for type safety.
+-->
+<Page
+    x:Class="RssReader.Views.FeedPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:RssReader.ViewModels"
+    xmlns:common="using:RssReader.Common">
+
+    <Page.Resources>
+        <common:BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Page.Resources>
+
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="AdaptiveStates">
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="720" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ArticleListColumn.Width" Value="380" />
+                        <Setter Target="DetailColumn.Width" Value="*" />
+                        <Setter Target="DetailPanel.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ArticleListColumn.Width" Value="*" />
+                        <Setter Target="DetailColumn.Width" Value="0" />
+                        <Setter Target="DetailPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="ArticleListColumn" Width="380" />
+            <ColumnDefinition x:Name="DetailColumn" Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Article List (Master) -->
+        <Grid Grid.Column="0" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" 
+              BorderThickness="0,0,1,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Feed header with refresh -->
+            <Grid Padding="16,12" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{x:Bind ViewModel.CurrentFeed.Name, Mode=OneWay}"
+                           Style="{StaticResource SubtitleTextBlockStyle}" 
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1" Click="RefreshButton_Click"
+                        ToolTipService.ToolTip="Refresh feed">
+                    <SymbolIcon Symbol="Refresh" />
+                </Button>
+            </Grid>
+
+            <!-- Loading indicator -->
+            <ProgressBar Grid.Row="1" VerticalAlignment="Top" IsIndeterminate="True"
+                         Visibility="{x:Bind ViewModel.CurrentFeed.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVis}}" />
+
+            <!-- Article list -->
+            <ListView Grid.Row="1" x:Name="ArticleList"
+                      ItemsSource="{x:Bind ViewModel.CurrentFeed.Articles, Mode=OneWay}"
+                      SelectedItem="{x:Bind ViewModel.CurrentArticle, Mode=TwoWay}"
+                      SelectionChanged="ArticleList_SelectionChanged"
+                      Padding="0,4,0,0">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ArticleViewModel">
+                        <Grid Padding="12,10" ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Bind Title}" 
+                                           Style="{StaticResource BodyStrongTextBlockStyle}"
+                                           MaxLines="2" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{x:Bind Summary}" 
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           MaxLines="2" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{x:Bind PublishedDateFormatted}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                       VerticalAlignment="Top" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <!-- Empty state -->
+            <StackPanel Grid.Row="1" 
+                        Visibility="{x:Bind ViewModel.CurrentFeed.IsEmpty, Mode=OneWay, Converter={StaticResource BoolToVis}}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                <SymbolIcon Symbol="PostUpdate" RenderTransformOrigin="0.5,0.5">
+                    <SymbolIcon.RenderTransform>
+                        <ScaleTransform ScaleX="2" ScaleY="2" />
+                    </SymbolIcon.RenderTransform>
+                </SymbolIcon>
+                <TextBlock Text="{x:Bind ViewModel.CurrentFeed.ErrorMessage, Mode=OneWay}"
+                           Style="{StaticResource BodyTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Article Detail -->
+        <Grid x:Name="DetailPanel" Grid.Column="1" Padding="24,16">
+            <ScrollViewer>
+                <StackPanel Spacing="12" MaxWidth="800">
+                    <TextBlock Text="{x:Bind ViewModel.CurrentArticle.Title, Mode=OneWay}"
+                               Style="{StaticResource TitleTextBlockStyle}"
+                               TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="{x:Bind ViewModel.CurrentArticle.Author, Mode=OneWay}"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock Text="{x:Bind ViewModel.CurrentArticle.PublishedDateFormatted, Mode=OneWay}"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind ViewModel.CurrentArticle.Summary, Mode=OneWay}"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               TextWrapping="Wrap" />
+                    <HyperlinkButton Content="Read full article"
+                                     NavigateUri="{x:Bind ViewModel.CurrentArticle.Link, Mode=OneWay}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>

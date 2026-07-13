@@ -1,0 +1,15 @@
+<!-- App-wide styles and resource references -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- MIGRATION NOTE: 
+         In UWP, you'd reference SystemChromeMediumColor and other system theme resources.
+         In WinUI 3, use the ThemeResource markup extension with the new resource names.
+         The naming convention changed from "SystemControlXxx" to semantic names like
+         "TextFillColorPrimary", "CardBackgroundFillColorDefault", etc.
+         
+         Full list: https://learn.microsoft.com/windows/apps/design/style/xaml-theme-resources
+    -->
+
+</ResourceDictionary>

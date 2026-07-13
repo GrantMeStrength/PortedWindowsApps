@@ -1,0 +1,60 @@
+<!-- MIGRATION NOTE: 
+     This replaces the entire custom AppShell.xaml + NavMenuListView.cs (~25KB of custom code).
+     WinUI 3's NavigationView provides built-in hamburger nav, selection tracking, and adaptive layout.
+     The old UWP approach used SplitView + custom ListView + manual selection management.
+-->
+<Window
+    x:Class="RssReader.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RssReader"
+    xmlns:vm="using:RssReader.ViewModels"
+    Title="RSS Reader">
+
+    <Grid>
+        <NavigationView
+            x:Name="NavView"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
+            PaneDisplayMode="Left"
+            SelectionChanged="NavView_SelectionChanged"
+            Loaded="NavView_Loaded">
+
+            <NavigationView.MenuItems>
+                <!-- Favorites is always first -->
+                <NavigationViewItem x:Name="FavoritesItem" Content="Favorites" Tag="Favorites">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="OutlineStar" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem x:Name="AddFeedItem" Content="Add Feed" Tag="AddFeed">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Add" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="EditFeedsItem" Content="Edit Feeds" Tag="EditFeeds">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Edit" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+            <!-- Content area: hosts our page content -->
+            <Frame x:Name="ContentFrame" />
+        </NavigationView>
+
+        <!-- Feed-added confirmation (InfoBar replaces custom TeachingTip/flyout) -->
+        <InfoBar
+            x:Name="FeedAddedInfoBar"
+            IsOpen="{x:Bind ViewModel.IsFeedAddedMessageShowing, Mode=OneWay}"
+            Severity="Success"
+            Title="Feed added"
+            Message="{x:Bind ViewModel.NameOfFeedJustAdded, Mode=OneWay}"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Center"
+            Margin="0,0,0,16" />
+    </Grid>
+</Window>

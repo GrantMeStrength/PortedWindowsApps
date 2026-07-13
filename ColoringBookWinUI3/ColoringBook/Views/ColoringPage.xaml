@@ -1,0 +1,149 @@
+<Page
+    x:Class="ColoringBook.Views.ColoringPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Loaded="OnLoaded"
+    Unloaded="OnUnloaded">
+
+    <!--
+    MIGRATION NOTE: Custom InkToolbar
+    
+    The UWP version had a massive custom InkToolbar (32KB of XAML). In WinUI 3:
+    - The built-in InkToolbar control exists but is less customizable
+    - We build a custom toolbar using standard XAML controls (CommandBar/StackPanel)
+    - This gives full control over tool layout and color palette
+    - The InkCanvas itself works nearly identically
+    -->
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Top toolbar: Back, Undo/Redo, tools -->
+        <CommandBar Grid.Row="0" DefaultLabelPosition="Right"
+                    Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+            <CommandBar.Content>
+                <Button Click="OnBackClicked"
+                        Style="{StaticResource NavigationBackButtonNormalStyle}"
+                        ToolTipService.ToolTip="Back" />
+            </CommandBar.Content>
+
+            <AppBarButton Icon="Undo" Label="Undo"
+                          Click="OnUndoClicked"
+                          IsEnabled="{x:Bind ViewModel.CanUndo, Mode=OneWay}" />
+            <AppBarButton Icon="Redo" Label="Redo"
+                          Click="OnRedoClicked"
+                          IsEnabled="{x:Bind ViewModel.CanRedo, Mode=OneWay}" />
+
+            <AppBarSeparator />
+
+            <!-- Drawing tools -->
+            <AppBarToggleButton x:Name="PenButton"
+                                Icon="Edit" Label="Pen"
+                                IsChecked="True"
+                                Click="OnToolSelected" Tag="Pen" />
+            <AppBarToggleButton x:Name="PencilButton"
+                                Label="Pencil"
+                                Click="OnToolSelected" Tag="Pencil">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xEDA1;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+            <AppBarToggleButton x:Name="CalligraphyButton"
+                                Label="Calligraphy"
+                                Click="OnToolSelected" Tag="Calligraphy">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xEDFB;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+            <AppBarToggleButton x:Name="EraserButton"
+                                Label="Eraser"
+                                Click="OnToolSelected" Tag="Eraser">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xE75C;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+
+            <AppBarSeparator />
+
+            <!-- Stroke size -->
+            <AppBarElementContainer>
+                <ComboBox x:Name="StrokeSizeCombo"
+                          Header="Size"
+                          Width="100"
+                          VerticalAlignment="Center"
+                          SelectionChanged="OnStrokeSizeChanged">
+                    <ComboBoxItem Content="2" Tag="2" />
+                    <ComboBoxItem Content="4" Tag="4" IsSelected="True" />
+                    <ComboBoxItem Content="8" Tag="8" />
+                    <ComboBoxItem Content="12" Tag="12" />
+                    <ComboBoxItem Content="16" Tag="16" />
+                    <ComboBoxItem Content="24" Tag="24" />
+                </ComboBox>
+            </AppBarElementContainer>
+
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Icon="Save" Label="Save" Click="OnSaveClicked" />
+                <AppBarButton Icon="Pictures" Label="Export" Click="OnExportClicked" />
+                <AppBarButton Label="Print" Click="OnPrintClicked">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE749;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Icon="Delete" Label="Clear All" Click="OnClearAllClicked" />
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+
+        <!-- Canvas area -->
+        <Grid Grid.Row="1">
+            <!-- Background template image -->
+            <Image x:Name="BackgroundImage"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" />
+
+            <!-- Ink canvas overlays the template image -->
+            <InkCanvas x:Name="DrawingCanvas" />
+        </Grid>
+
+        <!-- Bottom color palette -->
+        <ScrollViewer Grid.Row="2"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled"
+                      Padding="8">
+            <GridView x:Name="ColorPalette"
+                      ItemsSource="{x:Bind ViewModel.ColorPalette}"
+                      SelectionMode="Single"
+                      SelectedIndex="0"
+                      SelectionChanged="OnColorSelected"
+                      Height="48">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="4" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="Color">
+                        <Border Width="36" Height="36"
+                                CornerRadius="18"
+                                BorderBrush="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                BorderThickness="2">
+                            <Border CornerRadius="16"
+                                    Margin="2">
+                                <Border.Background>
+                                    <SolidColorBrush Color="{x:Bind}" />
+                                </Border.Background>
+                            </Border>
+                        </Border>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+        </ScrollViewer>
+
+        <!-- Hidden canvas used by PrintHelper for rendering print content -->
+        <Canvas x:Name="PrintCanvas" Opacity="0" />
+    </Grid>
+</Page>
