@@ -2,6 +2,7 @@
     x:Class="ColoringBook.Views.ColoringPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     Loaded="OnLoaded"
     Unloaded="OnUnloaded">
 
@@ -106,7 +107,7 @@
                    VerticalAlignment="Center" />
 
             <!-- Ink canvas overlays the template image -->
-            <InkCanvas x:Name="DrawingCanvas" />
+            <controls:InkCanvas x:Name="DrawingCanvas" />
         </Grid>
 
         <!-- Bottom color palette -->

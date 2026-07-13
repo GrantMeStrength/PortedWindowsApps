@@ -349,3 +349,5 @@ These topics are missing or insufficient in the current UWP→WinUI 3 migration 
 4. **RadialController interop** — No documentation for WinUI 3 radial controller access
 5. **SystemNavigationManager removal** — Back button alternatives not documented in migration guide
 6. **IRandomAccessStream bridging** — How to bridge System.IO streams with WinRT stream APIs
+7. **`InkCanvas` XAML namespace in WinUI 3** — `InkCanvas` is not in the default XAML namespace and requires an explicit `xmlns:controls="using:Microsoft.UI.Xaml.Controls"` declaration; this isn't called out in migration docs.
+8. **Win2D version staleness** — Old patch versions (e.g. 1.2.1) are periodically yanked from NuGet; docs don't warn about this or recommend a safe version pinning strategy.
